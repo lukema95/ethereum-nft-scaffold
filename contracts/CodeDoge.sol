@@ -80,7 +80,7 @@ contract CodeDoge is Ownable, ERC721A, ReentrancyGuard {
     require(totalSupply() + quantity <= collectionSize, "reached max supply");
     require(isAllowList(msg.sender, _merkleProof), "not eligible for whitelist mint");
     _safeMint(msg.sender, 1);
-    refundIfOver(price);
+    refundIfOver(price*quantity);
   }
 
   /**
