@@ -1,11 +1,11 @@
 import { useContractRead } from 'wagmi'
-import { useIsMounted, useContractABI } from '../hooks'
+import { contractConfig } from '../config'
 
 export function Info() {
-  const contractABI = useContractABI()
+  const contractABI = contractConfig.abi
 
   const {data} = useContractRead({
-    addressOrName: '0xcfb5D3EFe68249d0A499a8838947CB712a46F465',
+    addressOrName: contractConfig.address,
     contractInterface: contractABI,
     functionName: 'totalSupply',
     onSuccess(data) {

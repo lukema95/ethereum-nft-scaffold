@@ -1,12 +1,23 @@
 import {utils} from 'ethers'
-import { useAccount, useProvider, useContractRead, useContractWrite, useWaitForTransaction, useSendTransaction } from 'wagmi'
+import { useAccount, 
+        useProvider, 
+        useContractRead, 
+        useContractWrite, 
+        useWaitForTransaction, 
+        useSendTransaction } from 'wagmi'
 
-import { useIsMounted, useContractABI } from '../hooks'
+import { generateMerkleProof } from '../tools'
+import { useIsMounted } from '../hooks'
+import { contractConfig } from '../config'
 
-export function Mint(){
-  const { connector, isConnected } = useAccount()
+export function Mint(props){
+  const { address, connector, isConnected } = useAccount()
   const provider = useProvider()
-  const contractABI = useContractABI()
+  const contractABI = contractConfig.abi
+  const contractAddress = contractConfig.address
+  const phase = contractConfig.phase
+  const merkleProof = phase == 1 ? generateMerkleProof(props.merkleTree, address) : []
+  const publicSaleKey = phase == 2 ? contractConfig.publicSaleKey : 0
   
   // Read contract functin 
   // const {data} = useContractRead({
@@ -37,24 +48,43 @@ export function Mint(){
 
   // Write contact function and sent token to contract
   // Allowlist mint
-  const { data, isError, isLoading, write } = useContractWrite({
-    addressOrName: '0xcfb5D3EFe68249d0A499a8838947CB712a46F465',
+  // const { data, isError, isLoading, write } = useContractWrite({
+  //   addressOrName: contractAddress,
+  //   contractInterface: contractABI,
+  //   functionName: 'mint',
+  //   args:[1, node, keys],
+  //   //send token   
+  //   // overrides: {
+  //   //   from: '0x170E2080B502Fa935191d409b399c8e46D74621E',
+  //   //   value: utils.parseEther('0.005'),
+  //   // },
+  //   onSuccess(data) {
+  //     console.log('Success', data)
+  //   },
+  //   onError(error) {
+  //     console.log('Error', error)
+  //   },
+  // })
+  const { isSuccess, data, write } = useContractWrite({
+    addressOrName: contractAddress,
     contractInterface: contractABI,
-    functionName: 'publicSaleMint',
-
-    args:[123456],
-    // send token 
+    // args: [props.merkleProof],
+    functionName: "mint",
+    args: [props.quantity, publicSaleKey, merkleProof],
+    // send token
     // overrides: {
     //   from: '0x170E2080B502Fa935191d409b399c8e46D74621E',
     //   value: utils.parseEther('0.005'),
     // },
     onSuccess(data) {
-      console.log('Success', data)
+      openSnackbar("Transaction has been sent", 8000);
+      console.log("Mint success: ", data.blockHash);
     },
     onError(error) {
-      console.log('Error', error)
+      openSnackbar("Mint error: " + error.message, 8000);
+      console.log("Mint error", error);
     },
-  })
+  });
 
   // Wait tx result
   const waitForTransaction = useWaitForTransaction({
