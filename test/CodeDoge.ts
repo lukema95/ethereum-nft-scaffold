@@ -158,11 +158,62 @@ describe("CodeDoge", function() {
   })
 
   describe("Withdraws", async function () {
+    it("Should success if withdrawed money by owner", async function () {
+      const { codeDoge, owner, otherAccount } = await loadFixture(deployFixture)
+      // const balance = await owner.getBalance()
+      // const tx = {
+      //   to: codeDoge.address,
+      //   value: 100
+      // }
+      // const provider = ethers.getDefaultProvider();
+      // const balance1 = await provider.getBalance(codeDoge.address)
+      // console.log("balance1 is %s", balance1)
+      // await codeDoge.mint(1, 1, [], {value: 1000})
+      // const balance2 = await provider.getBalance(codeDoge.address)
+      // console.log("balance2 is %s", balance2)
+      // expect(await provider.getBalance(codeDoge.address)).to.be.equal(1000)
+      // TODO 完成余额测试
+      expect(await codeDoge.withdrawMoney()).not.be.reverted
+      // expect(await provider.getBalance(codeDoge.address)).to.be.equal(0)
+    })
 
+    it("Should fail if withdrawed money by owner", async function () {
+      const { codeDoge, otherAccount } = await loadFixture(deployFixture)
+      await expect(codeDoge.connect(otherAccount).withdrawMoney()).to.be.revertedWith("Ownable: caller is not the owner")
+    })
   })
 
   describe("Ownerships", async function () {
-    
+    it("Should success if transferred ownership by owner", async function () {
+      const { codeDoge, otherAccount} = await loadFixture(deployFixture)
+      await codeDoge.transferOwnership(otherAccount.address)
+      expect(await codeDoge.owner()).to.equal(otherAccount.address)
+    })
+
+    it("Should fail if transferred ownership by other account", async function () {
+      const { codeDoge, otherAccount} = await loadFixture(deployFixture)
+      await expect(codeDoge.connect(otherAccount).transferOwnership(otherAccount.address)).to.be.revertedWith("Ownable: caller is not the owner")
+    })
+  })
+
+  describe("Transfers", async function () {
+    it("Should success if transferred token by token owner", async function () {
+      const { codeDoge, owner, otherAccount} = await loadFixture(deployFixture)
+      await codeDoge.mint(1, 1, [])
+      expect(await codeDoge.ownerOf(0)).to.equal(owner.address)
+
+      await codeDoge.transferFrom(owner.address, otherAccount.address, 0)
+      expect(await codeDoge.ownerOf(0)).to.equal(otherAccount.address)
+    })
+
+    it("Should fail if transferred token by incorrect owner", async function () {
+      const { codeDoge, owner, otherAccount} = await loadFixture(deployFixture)
+      await codeDoge.mint(1, 1, [])
+      expect(await codeDoge.ownerOf(0)).to.equal(owner.address)
+      
+      await expect(codeDoge.transferFrom(otherAccount.address, otherAccount.address, 0)).to.be.revertedWith("ERC721A: transfer from incorrect owner")
+      
+    })
   })
 
 })
