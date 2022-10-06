@@ -3,7 +3,6 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { generateMerkleProof, generateMerkleTree } from '../tools/index'
-// const { ethers } = require('ethers')
 
 describe("CodeDoge", function() {
   async function deployFixture(){

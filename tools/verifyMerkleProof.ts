@@ -1,7 +1,7 @@
 import keccak256 from 'keccak256'
 import {generateMerkleRoot} from './generateMerkleRoot';
 
-export function verifyMerkleProof(merkleTree, address){
+export function verifyMerkleProof(merkleTree: any, address: string){
   const root = generateMerkleRoot(merkleTree);
   const leaf = keccak256(address);
   const proof = merkleTree.getHexProof(leaf);

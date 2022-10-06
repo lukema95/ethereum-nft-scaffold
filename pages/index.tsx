@@ -6,6 +6,7 @@ import { Account, Connect, Mint, Info } from '../components'
 import { useIsMounted } from '../hooks'
 import { generateMerkleProof, generateMerkleRoot, generateMerkleTree } from '../tools'
 import { whitelist } from '../config'
+import styles from './styles.module.css'
 
 const merkleTree = generateMerkleTree(whitelist)
 // const merkleRoot = generateMerkleRoot(merkleTree)
@@ -16,11 +17,12 @@ function Page() {
 
   return (
     <>
-      <Image 
+    <div className={styles.img}>
+    <Image 
         src="/home.jpeg"
-          alt="Picture of the project"
-          width={600}
-          height={600}
+        alt="Picture of the project"
+        width={600}
+        height={600}
       />
       <Info/>
       <Connect />
@@ -30,8 +32,11 @@ function Page() {
         </>
       )}
       <Mint
-      merkleTree = {merkleTree}
+      merkleTree = {merkleTree} 
+      quantity = {1}
       />
+    </div>
+      
     </>
   )
 }
